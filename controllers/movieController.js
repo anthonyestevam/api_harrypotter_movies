@@ -2,57 +2,65 @@ const Movie = require('../models/Movie');
 
 module.exports = class movieController {
     static async addMovie(req, res) {
-        const title = req.body.title;
-        const description = req.body.description;
-        const whereWatch = req.body.whereWatch;
-        const img = req.body.img;
+        const { title, description, whereWatch, img } = req.body;
 
-        //validations
-        if(!title) return res.status(400).json({message: 'title is required'})
-        if(!description) return res.status(400).json({message: 'description is required'})
-        if(!whereWatch) return res.status(400).json({message: 'whereWatch is required'})
-        if(!img) return res.status(400).json({message: 'img is required'})
-        
-        const newMovie = new Movie({
-            title,
-            description,
-            whereWatch,
-            img
-        })
-        //Creating new movie
+        if (!title || !description || !whereWatch || !img) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        const newMovie = new Movie({ title, description, whereWatch, img });
+
         try {
-            const movieSaved = await newMovie.save()
-            res.status(201).json(movieSaved)
-            
+            const movieSaved = await newMovie.save();
+            res.status(201).json({
+                movie: movieSaved,
+                _links: {
+                    self: { href: `/movies/${movieSaved._id}` },
+                    list: { href: `/movies` },
+                }
+            });
         } catch (error) {
-            res.status(500).json({message: error.message})
+            res.status(500).json({ message: error.message });
         }
     }
+
     static async getMovies(req, res) {
         try {
-            const movies = await Movie.find()
-            res.status(200).json(movies)
+            const movies = await Movie.find();
+            res.status(200).json({
+                movies,
+                _links: {
+                    self: { href: `/movies` }
+                }
+            });
         } catch (error) {
-            res.status(500).json({message: error.message})
+            res.status(500).json({ message: error.message });
         }
     }
 
     static async getMovieById(req, res) {
         const movieId = req.params.id;
+
         try {
             const movie = await Movie.findById(movieId);
 
             if (!movie) {
-                res.status(404).json({message: 'Movie not found'})
-            
+                return res.status(404).json({ message: 'Movie not found' });
             }
 
-            res.status(200).json(movie)
-            
+            res.status(200).json({
+                movie,
+                _links: {
+                    self: { href: `/movies/${movieId}` },
+                    list: { href: `/movies` },
+                    delete: { href: `/movies/${movieId}`, method: "DELETE" },
+                    update: { href: `/movies/${movieId}`, method: "PUT" }
+                }
+            });
         } catch (error) {
-            res.status(500).json({message: error.message})
-            
-        }}
+            res.status(500).json({ message: error.message });
+        }
+    }
 
     static async deleteMovie(req, res) {
         const movieId = req.params.id;
@@ -62,7 +70,13 @@ module.exports = class movieController {
             if (!movie) {
                 return res.status(404).json({ message: 'Movie not found' });
             }
-            res.status(200).json({ message: 'Movie deleted successfully' });
+
+            res.status(200).json({
+                message: 'Movie deleted successfully',
+                _links: {
+                    list: { href: `/movies` }
+                }
+            });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
@@ -72,25 +86,25 @@ module.exports = class movieController {
         const movieId = req.params.id;
         const { title, description, whereWatch, img } = req.body;
 
-        // validations
-        if (!title) return res.status(400).json({ message: 'title is required' });
-        if (!description) return res.status(400).json({ message: 'description is required' });
-        if (!whereWatch) return res.status(400).json({ message: 'whereWatch is required' });
-        if (!img) return res.status(400).json({ message: 'img is required' });
+        if (!title || !description || !whereWatch || !img) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
 
-        //updating movie
         try {
-            const movie = await Movie.findByIdAndUpdate(
-                movieId, 
-                { title, description, whereWatch, img }, 
-                { new: true } 
-            );
+            const movie = await Movie.findByIdAndUpdate(movieId, { title, description, whereWatch, img }, { new: true });
 
             if (!movie) {
                 return res.status(404).json({ message: 'Movie not found' });
             }
 
-            res.status(200).json(movie); 
+            res.status(200).json({
+                movie,
+                _links: {
+                    self: { href: `/movies/${movieId}` },
+                    list: { href: `/movies` },
+                    delete: { href: `/movies/${movieId}`, method: "DELETE" }
+                }
+            });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
