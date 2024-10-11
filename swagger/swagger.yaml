@@ -1,0 +1,105 @@
+openapi: 3.0.0
+info:
+  title: Harry Potter Movies API
+  description: API para gerenciar filmes de Harry Potter
+  version: 1.0.0
+paths:
+  /movies:
+    get:
+      summary: Listar todos os filmes
+      responses:
+        '200':
+          description: Lista de filmes retornada com sucesso
+        '500':
+          description: Erro no servidor
+    post:
+      summary: Adicionar um novo filme
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Harry Potter and the Philosopher's Stone"
+                description:
+                  type: string
+                  example: "Primeiro filme da série."
+                whereWatch:
+                  type: string
+                  example: "Netflix"
+                img:
+                  type: string
+                  example: "https://image-url.com"
+      responses:
+        '201':
+          description: Filme criado com sucesso
+        '400':
+          description: Dados inválidos
+        '500':
+          description: Erro no servidor
+  /movies/{id}:
+    get:
+      summary: Obter um filme pelo ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do filme
+      responses:
+        '200':
+          description: Detalhes do filme retornado com sucesso
+        '404':
+          description: Filme não encontrado
+        '500':
+          description: Erro no servidor
+    put:
+      summary: Atualizar um filme pelo ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do filme
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                whereWatch:
+                  type: string
+                img:
+                  type: string
+      responses:
+        '200':
+          description: Filme atualizado com sucesso
+        '400':
+          description: Dados inválidos
+        '404':
+          description: Filme não encontrado
+        '500':
+          description: Erro no servidor
+    delete:
+      summary: Deletar um filme pelo ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Filme deletado com sucesso
+        '404':
+          description: Filme não encontrado
+        '500':
+          description: Erro no servidor

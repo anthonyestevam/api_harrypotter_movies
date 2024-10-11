@@ -14,7 +14,13 @@
     "express": "^4.21.0",
     "mongoose": "^8.7.0",
     "moongoose": "^0.0.5",
+<<<<<<< HEAD
     "nodemon": "^3.1.7"
+=======
+    "nodemon": "^3.1.7",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
+>>>>>>> 27bbaa0 (atualizando projeto)
   },
   "devDependencies": {
     "jest": "^29.7.0"
